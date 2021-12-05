@@ -455,6 +455,10 @@ Form
     width: 250px;
 }
 
+#form input[type='day'] {
+    width: 250px;
+}
+
 #form textarea {
     padding-top: 10px;
     height: 200px;
@@ -549,6 +553,17 @@ EXCEEDS - About Page
     color: var(--white);
     font-size: 20px;
     padding-right: 10px;
+}
+
+/*******
+404 Page
+********/
+
+#not-found {
+    background-color: var(--secondary);
+    position: relative;
+    padding: 3rem 5%;
+    text-align: center;
 }
 
 /*******
@@ -667,7 +682,7 @@ Media Queries
     .header .project-skills {
         -webkit-column-count: 2;  /* Chrome/Opera, Safari */
         -moz-column-count: 2; /* Mozilla Firefox */
-        column-count: 2;
+        column-count: 1;
         max-width: 500px;
     }
 
