@@ -96,4 +96,40 @@ def downloadFile():
 
 if __name__ == '__main__':
     db.create_all()
+    project1 = Project(
+        title="Number Guessing Game",
+        created=datetime.datetime(2020, 4, 19),
+        description="""
+                        \nPython TechDegree First Project Number Guessing Game""",
+        skills="Python",
+        url="https://github.com/masonbcoding/python-techdegree-project-1")
+
+    project2 = Project(
+        title="Basketball Stats Tool",
+        created=datetime.datetime(2020, 10, 2),
+        description="""
+                        \nSecond Project: Basketball Stat Tracker and Team Organizer""",
+        skills="Python",
+        url="https://github.com/masonbcoding/python_techdegree_project_2")
+
+    project3 = Project(
+        title="Phrase Hunter",
+        created=datetime.datetime(2020, 11, 7),
+        description="""
+                        \nThird Project: Console Guessing Game""",
+        skills="Python",
+        url="https://github.com/masonbcoding/techdegree-project-3-phrase-hunter")
+
+    project4 = Project(
+        title="A Store Inventory",
+        created=datetime.datetime(2018, 6, 1),
+        description="""
+                        \nFourth Project: Store Inventory Management Tool""",
+        skills="Python",
+        url="https://github.com/masonbcoding/techdegree-project4-a-store-inventory")
+
+
+    db.session.add(project1)
+    db.session.commit()
+    app.run(debug=True, port=8000, host='0.0.0.0')
     app.run(debug=True, port=8000, host='127.0.0.1')
