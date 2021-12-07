@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     project4 = Project(
         title="A Store Inventory",
-        created=datetime.datetime(2018, 6, 1),
+        created=datetime.datetime(2021, 11, 30),
         description="""
                         \nFourth Project: Store Inventory Management Tool""",
         skills="Python",
