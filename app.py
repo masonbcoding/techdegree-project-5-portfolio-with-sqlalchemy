@@ -7,90 +7,93 @@ editing a project, the application prompts the user for title, date, skills,
 description, and a link to a repo. The results for these entries are stored in
 a database and displayed on the homepage.
 """
-from flask import render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, redirect, send_file
 from models import db, Project, app
+from time import sleep
 import datetime
 
 
-@app.route("/")
-def portfolio_index():
-    """Portfolio homepage/index."""
-    portfolio = Project.query.all()
-    return render_template("index.html", portfolio=portfolio)
+@app.route('/')
+def index():
+    """Portfolio Homepage"""
+    all_projects = Project.query.all()
+    return render_template('index.html', projects=all_projects)
 
 
 @app.route("/about")
-def about_author():
-    """Display author's about page."""
-    portfolio = Project.query.all()
-    return render_template("about.html", portfolio=portfolio)
+def about():
+    """Mason's About Page"""
+    all_projects = Project.query.all()
+    return render_template("about.html", projects=all_projects)
 
 
-@app.route("/project/<id>")
-def project_details(id):
-    """Display details of a project."""
-    portfolio = Project.query.all()
+@app.route('/projects/<id>')
+def detail(id):
+    """Return the details of a project"""
+    all_projects = Project.query.all()
     project = Project.query.get_or_404(id)
-    return render_template("detail.html", project=project, portfolio=portfolio)
+    return render_template('detail.html', projects=all_projects, project=project)
 
-
-@app.route("/project/new", methods=['GET', 'POST'])
+@app.route('/projects/new', methods=['GET', 'POST'])
 def new_project():
-    """Add a new project."""
-    portfolio = Project.query.all()
+    """Add a new project to the portfolio"""
+    all_projects = Project.query.all()
     if request.form:
-        split_month_and_year = request.form["date"].split("-")
-        year = int(split_month_and_year[0])
-        month = int(split_month_and_year[1])
-        day = int(request.form["day"])
-        new_project = Project(title=request.form["title"],
-                              date_completed=datetime.datetime(year,
-                              month, day),
-                              description=request.form["description"],
-                              skills=request.form["skills"],
-                              github=request.form["github"])
+        new_project = Project(created=datetime.datetime.strptime(request.form['date'], "%Y-%m"),
+                              title=request.form['title'],
+                              description=request.form['desc'],
+                              skills=request.form['skills'],
+                              url=request.form['github'])
         db.session.add(new_project)
         db.session.commit()
-        return redirect(url_for("portfolio_index"))
-    return render_template("projectform.html", portfolio=portfolio)
+        return redirect(url_for('index'))
+    return render_template('projectform.html', projects=all_projects)
 
 
 @app.route("/project/<id>/edit", methods=['GET', 'POST'])
 def edit_project(id):
-    """Edit a project."""
-    portfolio = Project.query.all()
+    """Edit a Project"""
+    all_projects = Project.query.all()
     project = Project.query.get_or_404(id)
     if request.form:
-        split_month_and_year = request.form["date"].split("-")
-        year = int(split_month_and_year[0])
-        month = int(split_month_and_year[1])
-        day = int(request.form["day"])
-        project.title = request.form["title"]
-        project.date_completed = datetime.datetime(year, month, day)
-        project.description = request.form["description"]
-        project.skills = request.form["skills"]
-        project.github = request.form["github"]
+        project.created = datetime.datetime.strptime(
+            request.form['date'], "%Y-%m")
+        project.title = request.form['title']
+        project.description = request.form['desc']
+        project.skills = request.form['skills']
+        project.url = request.form['github']
         db.session.commit()
-        return redirect(url_for("portfolio_index"))
-    return render_template("editform.html", project=project, portfolio=portfolio)
+        print(project)
+        return redirect(url_for('index'))
+    return render_template('edit.html', projects=all_projects, project=project)
 
 
 @app.route("/projects/<id>/delete", methods=['GET', 'POST'])
-def delete_project(id):
-    """Delete a project."""
+def delete(id):
+    """Delete a Project."""
     project = Project.query.get_or_404(id)
     db.session.delete(project)
     db.session.commit()
-    return redirect(url_for("portfolio_index"))
+    return redirect(url_for("index"))
 
 
 @app.errorhandler(404)
 def not_found(error):
-    """Display 404 error page."""
+    """404 Error Page."""
     portfolio = Project.query.all()
-    return render_template("404.html", msg=error, portfolio=portfolio), 404
+    return render_template("404.html", msg=error), 404
 
 
-if __name__ == "__main__":
+# adapted from https://stackoverflow.com/questions/24577349/flask-download-a-file
+@app.route('/download')
+def downloadFile():
+    """Display Mason CV"""
+    path = "masonbcoding_CV.pdf"
+    return send_file(path, as_attachment=True)
+# end adaptation
+
+
+
+if __name__ == '__main__':
     db.create_all()
-    app.run(debug=True, port=8000, host="127.0.0.1")
+    app.run(debug=True, port=8000, host='127.0.0.1')
