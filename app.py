@@ -117,9 +117,9 @@ if __name__ == '__main__':
         ''')
 
 
-    db.session.add(project_1)
-    db.session.add(project_2)
-    db.session.add(project_3)
-    db.session.add(project_4)
-    db.session.commit()
+    #db.session.add(project_1)
+    #db.session.add(project_2)
+    #db.session.add(project_3)
+    #db.session.add(project_4)
+    #db.session.commit()
     app.run(debug=True, port=8000, host='127.0.0.1')
