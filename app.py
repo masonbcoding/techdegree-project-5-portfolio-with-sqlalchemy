@@ -7,36 +7,27 @@ editing a project, the application prompts the user for title, date, skills,
 description, and a link to a repo. The results for these entries are stored in
 a database and displayed on the homepage.
 """
-from flask import Flask, render_template, url_for, request, redirect, send_file
+
+
+from flask import render_template, redirect, url_for, request
 from models import db, Project, app
-from time import sleep
 import datetime
 
 
 @app.route('/')
 def index():
-    """Portfolio Homepage"""
     all_projects = Project.query.all()
     return render_template('index.html', projects=all_projects)
 
 
-@app.route("/about")
+@app.route('/about')
 def about():
-    """Mason's About Page"""
     all_projects = Project.query.all()
-    return render_template("about.html", projects=all_projects)
+    return render_template('about.html', projects=all_projects)
 
-
-@app.route('/projects/<id>')
-def detail(id):
-    """Return the details of a project"""
-    all_projects = Project.query.all()
-    project = Project.query.get_or_404(id)
-    return render_template('detail.html', projects=all_projects, project=project)
 
 @app.route('/projects/new', methods=['GET', 'POST'])
-def new_project():
-    """Add a new project to the portfolio"""
+def new():
     all_projects = Project.query.all()
     if request.form:
         new_project = Project(created=datetime.datetime.strptime(request.form['date'], "%Y-%m"),
@@ -50,9 +41,15 @@ def new_project():
     return render_template('projectform.html', projects=all_projects)
 
 
-@app.route("/project/<id>/edit", methods=['GET', 'POST'])
-def edit_project(id):
-    """Edit a Project"""
+@app.route('/projects/<id>')
+def detail(id):
+    all_projects = Project.query.all()
+    project = Project.query.get_or_404(id)
+    return render_template('detail.html', projects=all_projects, project=project)
+
+
+@app.route('/projects/<id>/edit', methods=['GET', 'POST'])
+def edit(id):
     all_projects = Project.query.all()
     project = Project.query.get_or_404(id)
     if request.form:
@@ -68,68 +65,19 @@ def edit_project(id):
     return render_template('edit.html', projects=all_projects, project=project)
 
 
-@app.route("/projects/<id>/delete", methods=['GET', 'POST'])
+@app.route('/project/<id>/delete')
 def delete(id):
-    """Delete a Project."""
     project = Project.query.get_or_404(id)
     db.session.delete(project)
     db.session.commit()
-    return redirect(url_for("index"))
+    return redirect(url_for('index'))
 
 
 @app.errorhandler(404)
 def not_found(error):
-    """404 Error Page."""
-    portfolio = Project.query.all()
     return render_template("404.html", msg=error), 404
-
-
-# adapted from https://stackoverflow.com/questions/24577349/flask-download-a-file
-@app.route('/download')
-def downloadFile():
-    """Display Mason CV"""
-    path = "masonbcoding_CV.pdf"
-    return send_file(path, as_attachment=True)
-# end adaptation
-
 
 
 if __name__ == '__main__':
     db.create_all()
-    project1 = Project(
-        title="Number Guessing Game",
-        created=datetime.datetime(2020, 4, 19),
-        description="""
-                        \nPython TechDegree First Project Number Guessing Game""",
-        skills="Python",
-        url="https://github.com/masonbcoding/python-techdegree-project-1")
-
-    project2 = Project(
-        title="Basketball Stats Tool",
-        created=datetime.datetime(2020, 10, 2),
-        description="""
-                        \nSecond Project: Basketball Stat Tracker and Team Organizer""",
-        skills="Python",
-        url="https://github.com/masonbcoding/python_techdegree_project_2")
-
-    project3 = Project(
-        title="Phrase Hunter",
-        created=datetime.datetime(2020, 11, 7),
-        description="""
-                        \nThird Project: Console Guessing Game""",
-        skills="Python",
-        url="https://github.com/masonbcoding/techdegree-project-3-phrase-hunter")
-
-    project4 = Project(
-        title="A Store Inventory",
-        created=datetime.datetime(2021, 11, 30),
-        description="""
-                        \nFourth Project: Store Inventory Management Tool""",
-        skills="Python",
-        url="https://github.com/masonbcoding/techdegree-project4-a-store-inventory")
-
-
-    db.session.add(project1)
-    db.session.commit()
-    app.run(debug=True, port=8000, host='0.0.0.0')
     app.run(debug=True, port=8000, host='127.0.0.1')
